@@ -2,52 +2,45 @@
 # example.py - Das Zen-Meisterstück
 
 from core.app import App
-from components.layout import VStack, HStack, Spacer
+from components.layout import VStack, HStack, Spacer, Box
 from components.widgets import Label, Button
 
 def startup(app):
-    """
-    Diese Funktion wird aufgerufen, sobald der Splash-Screen bestätigt wurde.
-    Sie dient als Konstruktor für das eigentliche User-Interface.
-    """
-    
-    # 1. Hauptfenster definieren
-    # .window() gibt das Window-Objekt zurück
-    # .content() füllt es mit dem Root-Layout
-    app.window(title="AnthroEditor", size=(700, 500)).content(
-        
-        # 2. Das Root-Layout (Vertikaler Stapel)
-        VStack(padding=60, spacing=20).children(
-            
-            # Ein großes, edles Label (Headline)
-            Label("AnthroEditor")
-                .font(size=48, weight="bold")
-                .color("primary"),
-            
-            # Ein dezenter Untertitel
-            Label("Erstelle Großartiges in absoluter Stille.")
-                .font(size=16)
-                .color("secondary"),
-            
-            # Ein Spacer drückt die Buttons nach unten
-            Spacer(),
-            
-            # 3. Eine horizontale Reihe für die Interaktion
-            HStack(spacing=12).children(
+    (app.window()
+        .title("AnthroEditor")
+        .size(700, 500)
+        .make_noble(level="subtle", intensity=1.0)
+        .on_close(app.stop)
+        .content(
+            VStack(padding=60, spacing=30).content( # Haupt-Container
+
+                # 1. Header Bereich
+                VStack(spacing=5).content(
+                    Label("AnthroEditor")
+                        .font(size=48, weight="bold")
+                        .color("primary"),
+                    Label("Erstelle Großartiges in absoluter Stille.")
+                        .font(size=16)
+                        .color("secondary"),
+                ),
                 
-                Button("Einstellungen")
-                    .width(140)
-                    .action(lambda: print("Öffne Settings...")),
+                Spacer(),
                 
-                Button("Projekt Starten")
-                    .width(160)
-                    .primary()  # Markiert dies als Hauptaktion (Enter-Taste)
-                    .action(lambda: print("Lade Editor...")),
-                
-                # Der Beenden-Button nutzt direkt die Methode der App-Klasse
-                Button("Exit")
-                    .width(80)
-                    .action(app.stop)
+                # 2. Aktions-Bereich in einer edlen Box
+                # Wir nutzen jetzt einen HEX-Code für ein tiefes Anthrazit
+                Box(padding=25)
+                    .background("#1A1A1A", alpha=0.4) 
+                    .corner_radius(16)
+                    .content(
+                        VStack(spacing=15).content(
+                            Label("Projekt-Steuerung").font(size=12, weight="bold").color("secondary"),
+                            HStack(spacing=12).content(
+                                Button("Optionen").width(120),
+                                Button("Projekt Starten").width(160).primary(),
+                                Button("Exit").width(80).action(app.stop)
+                            )
+                        )
+                    )
             )
         )
     )

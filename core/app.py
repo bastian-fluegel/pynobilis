@@ -13,9 +13,10 @@ class App:
         self.ns_app.setActivationPolicy_(AppKit.NSApplicationActivationPolicyRegular)
         self._main_window = None
 
-    def window(self, title=None, size=(800, 600)):
-        """Erstellt das Hauptfenster im Fluent-Stil."""
-        self._main_window = Window(title or self.name, size[0], size[1])
+    # core/app.py
+    def window(self):
+        from components.window import Window
+        self._main_window = Window()
         return self._main_window
 
     def run(self, startup_callback=None):
