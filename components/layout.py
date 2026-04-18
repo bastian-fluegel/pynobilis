@@ -47,8 +47,6 @@ class Spacer(NobilisView):
         self.ns_view.setContentHuggingPriority_forOrientation_(1, 0)
         self.ns_view.setContentHuggingPriority_forOrientation_(1, 1)
 
-# components/layout.py (Erweiterung)
-
 class Box(NobilisView):
     def __init__(self, padding=0):
         super().__init__()
@@ -58,6 +56,7 @@ class Box(NobilisView):
         
         # Interner Stack für das Layout in der Box
         self._layout = AppKit.NSStackView.stackViewWithViews_([])
+        # NSEdgeInsets: (top, left, bottom, right)
         self._layout.setEdgeInsets_((padding, padding, padding, padding))
         self.ns_view.addSubview_(self._layout)
         
@@ -69,13 +68,14 @@ class Box(NobilisView):
             self._layout.topAnchor().constraintEqualToAnchor_(self.ns_view.topAnchor()),
             self._layout.bottomAnchor().constraintEqualToAnchor_(self.ns_view.bottomAnchor()),
         ])
-
-    # components/layout.py (Upgrade für die Box-Klasse)
+        
+        # Speicher-Anker für Farben (verhindert Pointer-Warnungen)
+        self._bg_color_ref = None
+        self._border_color_ref = None
 
     def background(self, color_value, alpha=1.0):
         """Unterstützt 'system', 'black', 'white' und HEX."""
         if color_value == "system":
-            # Das ist das Geheimnis für den 'Native' Look
             color = AppKit.NSColor.secondarySystemFillColor()
         elif color_value.startswith("#"):
             hex_str = color_value.lstrip('#')
@@ -86,15 +86,18 @@ class Box(NobilisView):
         else:
             color = AppKit.NSColor.whiteColor().colorWithAlphaComponent_(alpha)
             
-        self.ns_view.layer().setBackgroundColor_(color.CGColor())
+        # Pointer-Anker: Wir speichern das Objekt, damit CGColor valide bleibt
+        self._bg_color_ref = color
+        self.ns_view.layer().setBackgroundColor_(self._bg_color_ref.CGColor())
         return self
 
     def border(self, width=0.5, color_name="separator"):
         """Fügt einen hauchdünnen nativen Rahmen hinzu."""
         self.ns_view.layer().setBorderWidth_(width)
-        # separatorColor ist die Standardfarbe für Linien in macOS
-        color = AppKit.NSColor.separatorColor().CGColor()
-        self.ns_view.layer().setBorderColor_(color)
+        
+        # Pointer-Anker für den Rahmen
+        self._border_color_ref = AppKit.NSColor.separatorColor()
+        self.ns_view.layer().setBorderColor_(self._border_color_ref.CGColor())
         return self
 
     def corner_radius(self, radius):
@@ -105,6 +108,7 @@ class Box(NobilisView):
     def content(self, *args):
         """Fügt Elemente in die Box ein (Roter Faden!)."""
         for child in args:
-            view = child.ns_view if hasattr(child, 'ns_view') else child
-            self._layout.addArrangedSubview_(view)
+            if child:
+                view = child.ns_view if hasattr(child, 'ns_view') else child
+                self._layout.addArrangedSubview_(view)
         return self
