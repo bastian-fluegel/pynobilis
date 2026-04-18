@@ -70,14 +70,16 @@ class Box(NobilisView):
             self._layout.bottomAnchor().constraintEqualToAnchor_(self.ns_view.bottomAnchor()),
         ])
 
+    # components/layout.py (Upgrade für die Box-Klasse)
+
     def background(self, color_value, alpha=1.0):
-        """Unterstützt 'black', 'white' und HEX-Codes wie '#123456'."""
-        if color_value.startswith("#"):
-            # HEX zu NSColor Konvertierung
+        """Unterstützt 'system', 'black', 'white' und HEX."""
+        if color_value == "system":
+            # Das ist das Geheimnis für den 'Native' Look
+            color = AppKit.NSColor.secondarySystemFillColor()
+        elif color_value.startswith("#"):
             hex_str = color_value.lstrip('#')
-            r = int(hex_str[0:2], 16) / 255.0
-            g = int(hex_str[2:4], 16) / 255.0
-            b = int(hex_str[4:6], 16) / 255.0
+            r, g, b = (int(hex_str[i:i+2], 16) / 255.0 for i in (0, 2, 4))
             color = AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(r, g, b, alpha)
         elif color_value == "black":
             color = AppKit.NSColor.blackColor().colorWithAlphaComponent_(alpha)
@@ -85,6 +87,14 @@ class Box(NobilisView):
             color = AppKit.NSColor.whiteColor().colorWithAlphaComponent_(alpha)
             
         self.ns_view.layer().setBackgroundColor_(color.CGColor())
+        return self
+
+    def border(self, width=0.5, color_name="separator"):
+        """Fügt einen hauchdünnen nativen Rahmen hinzu."""
+        self.ns_view.layer().setBorderWidth_(width)
+        # separatorColor ist die Standardfarbe für Linien in macOS
+        color = AppKit.NSColor.separatorColor().CGColor()
+        self.ns_view.layer().setBorderColor_(color)
         return self
 
     def corner_radius(self, radius):

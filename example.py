@@ -16,10 +16,10 @@ def startup(app):
 
                 # 1. Header Bereich
                 VStack(spacing=5).content(
-                    Label("AnthroEditor")
+                    Label("Beispiel-App")
                         .font(size=48, weight="bold")
                         .color("primary"),
-                    Label("Erstelle Großartiges in absoluter Stille.")
+                    Label("Dies ist eine Beispiel-App. Es wird noch viel mehr kommen.\nDas ist jetzt erstmal der Anfang für macOS – Windows folgt dann später.")
                         .font(size=16)
                         .color("secondary"),
                 ),
@@ -27,13 +27,15 @@ def startup(app):
                 Spacer(),
                 
                 # 2. Aktions-Bereich in einer edlen Box
-                # Wir nutzen jetzt einen HEX-Code für ein tiefes Anthrazit
                 Box(padding=25)
-                    .background("#1A1A1A", alpha=0.4) 
-                    .corner_radius(16)
+                    .background("system") # <--- Nutzt jetzt die intelligente Systemfarbe
+                    .border(0.5)          # <--- Gibt der Box Definition im Light Mode
+                    .corner_radius(12)
                     .content(
                         VStack(spacing=15).content(
-                            Label("Projekt-Steuerung").font(size=12, weight="bold").color("secondary"),
+                            Label("Projekt-Steuerung")
+                                .font(size=12, weight="bold")
+                                .color("secondary"),
                             HStack(spacing=12).content(
                                 Button("Optionen").width(120),
                                 Button("Projekt Starten").width(160).primary(),
@@ -47,7 +49,7 @@ def startup(app):
 
 def main():
     # Erstellt die App-Instanz mit deinem Branding
-    app = App(name="AnthroEditor")
+    app = App(name="Beispiel-App")
     
     # Startet den Lifecycle:
     # 1. Zeigt den Splash-Screen
